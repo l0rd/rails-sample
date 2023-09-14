@@ -1,0 +1,42 @@
+schemaVersion: 2.2.0
+metadata:
+  name: rails-blog
+components:
+  - name: bundle-volume
+    volume:
+      size: 1G
+  - name: devtools
+    container:
+      image: quay.io/mloriedo/rails-blog-cde:latest
+      memoryRequest: 2G
+      memoryLimit: 4G
+      cpuRequest: '1'
+      cpuLimit: '2'
+      volumeMounts:
+        - name: bundle-volume
+          path: /home/user/.bundle/vendor
+      endpoints:
+        - name: blog
+          exposure: public
+          protocol: https
+          targetPort: 3000
+          path: /articles
+commands:
+  - id: bundle-install
+    exec:
+      component: devtools
+      commandLine: bundle install
+      workingDir: ${PROJECT_SOURCE}
+  - id: server-start
+    exec:
+      component: devtools
+      commandLine: |
+        export RAILS_DEVELOPMENT_HOSTS="${CHE_DASHBOARD_URL/https:\/\/devspaces/}" &&
+        ./bin/rails server --binding 0.0.0.0
+  - id: server-kill
+    exec:
+      component: devtools
+      commandLine: kill $(pidof "ruby")
+events:
+  postStart:
+    - bundle-install
