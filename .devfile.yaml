@@ -1,6 +1,10 @@
 schemaVersion: 2.2.0
 metadata:
   name: rails-blog
+attributes:
+  controller.devfile.io/devworkspace-config:
+    name: custom-dwoc
+    namespace: l0rd-che
 components:
   - name: bundle-volume
     volume:
